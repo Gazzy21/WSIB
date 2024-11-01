@@ -10,31 +10,36 @@ $(document).ready(function () {
     };
 
     $("#submitDay").on("click", function () {
-        if ($("#dayInput").val().toUpperCase() === "A") {
-            console.log("A");
-
-        } else if ($("#dayInput").val().toUpperCase() === "B") {
-            console.log("B");
-        } else if ($("#dayInput").val().toUpperCase() === "C") {
-            console.log("C");
-        } else if ($("#dayInput").val().toUpperCase() === "D") {
-            console.log("D");
-        } else if ($("#dayInput").val().toUpperCase() === "E") {
-            console.log("E");
-        } else if ($("#dayInput").val().toUpperCase() === "F") {
-            console.log("F");
-        } else if ($("#dayInput").val().toUpperCase() === "G") {
-            console.log("G");
-        } else {
-            console.log("Error");
-        }
-    });
-
-    $("#submitDay").on("click", function () {
         const selectedDay = $("#dayInput").val().toUpperCase();
         if (!["A", "B", "C", "D", "E", "F", "G"].includes(selectedDay)) {
             alert("Please enter a valid day (A-G)");
             return;
         }
+        $.ajax({
+            type: "GET",
+            url: scheduleUrl,
+            success: function (response) {
+                const schedule = response.schedule
+                const dayFilter = schedule.filter(classInfo => classInfo.days.includes(selectedDay));            
+                $('#scheduleList').empty();
+                let i = 1
+                dayFilter.forEach(element => {
+                    let htmlString = `
+                    <tr>
+                        <td>${element.period}</td>
+                        <td>${bellSchedule[i].start} - ${bellSchedule[i].end}</td>
+                        <td>${element.class}</td>
+                        <td>${element.teacher}</td>
+                        <td>${element.room}</td>
+                    </tr>
+                    `
+                    $('#scheduleList').append(htmlString);
+                    i++
+                });
+            },
+            error: function () {
+                alert("Error Occured: Try again!");
+            }
+        });
     });
 });
